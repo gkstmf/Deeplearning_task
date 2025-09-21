@@ -68,11 +68,18 @@ class UsageScheduler:
     def show_status(self, icon=None, item=None):
         """현재 상태 표시"""
         try:
+            # 실시간 통계 가져오기
+            realtime_stats = self.tracker.get_realtime_stats()
+            
+            # 간단한 요약 메시지
             df = self.tracker.get_usage_stats(days=1)
             if not df.empty:
                 total_time = df['total_duration'].sum() / 3600
                 app_count = df['app_name'].nunique()
-                message = f"오늘 사용시간: {total_time:.1f}시간\n사용 앱 수: {app_count}개"
+                top_app = df.groupby('app_name')['total_duration'].sum().idxmax()
+                top_app_time = df.groupby('app_name')['total_duration'].sum().max() / 3600
+                
+                message = f"📱 오늘 사용시간: {total_time:.1f}시간\n📋 사용 앱 수: {app_count}개\n🏆 최다 사용: {top_app} ({top_app_time:.1f}시간)\n⏰ 현재 앱: {self.tracker.current_app or '없음'}"
             else:
                 message = "오늘 사용 데이터가 없습니다."
                 
@@ -82,7 +89,7 @@ class UsageScheduler:
             try:
                 import win10toast
                 toaster = win10toast.ToastNotifier()
-                toaster.show_toast("앱 사용시간 추적기", message, duration=5)
+                toaster.show_toast("앱 사용시간 추적기", message, duration=8)
             except ImportError:
                 print(message)
                 
@@ -151,9 +158,12 @@ class UsageScheduler:
             # 리포트 생성
             charts, analysis = self.generate_weekly_report()
             
+            # 실시간 통계 추가
+            realtime_stats = self.tracker.get_realtime_stats()
+            
             # 메시지 전송
             current_time = datetime.now().strftime("%Y년 %m월 %d일 %H:%M")
-            header_message = f"📊 주간 앱 사용시간 리포트\n생성일시: {current_time}\n\n{analysis}"
+            header_message = f"📊 주간 앱 사용시간 리포트\n생성일시: {current_time}\n\n{realtime_stats}\n\n{analysis}"
             
             if charts:
                 success = self.kakao_sender.send_multiple_images(charts, header_message)
