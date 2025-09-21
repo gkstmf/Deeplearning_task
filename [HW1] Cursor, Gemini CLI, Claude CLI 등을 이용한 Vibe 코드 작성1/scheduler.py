@@ -179,13 +179,13 @@ class UsageScheduler:
             
     def schedule_jobs(self):
         """작업 스케줄링 설정"""
-        # 매주 일요일 오후 10시에 리포트 전송
-        schedule.every().sunday.at("22:00").do(self.send_weekly_report)
+        # 매주 일요일 오후 10시 20분에 리포트 전송
+        schedule.every().sunday.at("22:20").do(self.send_weekly_report)
         
         # 테스트용: 매일 오후 6시에 리포트 전송 (필요시 활성화)
         # schedule.every().day.at("18:00").do(self.send_weekly_report)
         
-        self.logger.info("스케줄 설정 완료: 매주 일요일 오후 10시")
+        self.logger.info("스케줄 설정 완료: 매주 일요일 오후 10시 20분")
         
     def run_scheduler(self):
         """스케줄러 실행"""
@@ -251,7 +251,7 @@ def main():
     
     print("=== 앱 사용시간 추적 및 자동화 프로그램 ===")
     print("1. 앱 사용시간을 자동으로 추적합니다.")
-    print("2. 매주 일요일 오후 10시에 카카오톡으로 리포트를 전송합니다.")
+    print("2. 매주 일요일 오후 10시 20분에 카카오톡으로 리포트를 전송합니다.")
     print("3. 시스템 트레이에서 상태를 확인할 수 있습니다.")
     print()
     
